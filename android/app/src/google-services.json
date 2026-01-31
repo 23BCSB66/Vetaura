@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "612889856960",
+    "project_id": "ahimyx",
+    "storage_bucket": "ahimyx.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:612889856960:android:674d7a8b42a2343185d625",
+        "android_client_info": {
+          "package_name": "com.example.jeev_raksha"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4b74bR4NVfeEKeQw74MFrOM7WrDv30Fc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

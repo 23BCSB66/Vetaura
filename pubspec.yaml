@@ -1,0 +1,41 @@
+name: jeev_raksha
+description: An app to help stray animals with food, treatment, shelter, and adoption.
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_fonts: ^8.0.0
+  firebase_core: ^4.4.0
+  firebase_auth: ^6.1.4
+  google_sign_in: ^6.3.0
+
+  cupertino_icons: ^1.0.6
+
+  # (Add payment or maps later — not now)
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
