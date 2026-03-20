@@ -1,0 +1,24 @@
+# Vetaura Project Tasks
+
+- [ ] **Phase 1: Foundation & Authentication**
+  - [ ] Initialize Python Backend (e.g., FastAPI setup with Firebase Admin SDK)
+  - [ ] Set up Firebase Project, Auth & Firestore Database
+  - [ ] Connect Flutter App to Firebase Auth
+  - [ ] Update frontend Login/Signup to use Firebase Auth
+- [ ] **Phase 2: Core UX/UI & App Navigation**
+  - [ ] Implement state management (e.g., Provider or Riverpod)
+  - [ ] Set up main bottom navigation bar routing to the 4 modules
+- [ ] **Phase 3: Rescue SOS Module**
+  - [ ] Develop Flutter SOS UI and Location Fetching integration
+  - [ ] Develop Python API for Geospatial Routing of SOS to nearest NGO
+- [ ] **Phase 4: Forever Homes Module**
+  - [ ] Create Firestore Database Schema for Animal Profiles
+  - [ ] Develop Adoption Listing and Detail Screens in Flutter
+- [ ] **Phase 5: Care Map Module**
+  - [ ] Integrate Map SDK in Flutter
+  - [ ] Develop Python API for fetching nearby verified services
+  - [ ] Build interactive Map UI with Filters
+- [ ] **Phase 6: Vetaura Premium Module**
+  - [ ] Integrate Payment Gateway (Stripe/Razorpay)
+  - [ ] Implement service booking screens and logic
+  - [ ] Build backend endpoints for payment verification

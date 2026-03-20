@@ -33,18 +33,12 @@ class ImpactCard extends StatelessWidget {
         children: [
           Icon(icon, color: AppColors.primary, size: 28),
           const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
+          Text(title,
+              style: const TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textLight,
-            ),
-          ),
+          Text(subtitle,
+              style: const TextStyle(
+                  fontSize: 12, color: AppColors.textLight)),
         ],
       ),
     );
