@@ -4,9 +4,11 @@ import 'dart:ui';
 import 'donation_screen.dart';
 import 'sos_routing_screen.dart';
 import 'adoption_feed_screen.dart';
+import 'animal_detail_screen.dart';
 import 'care_map_screen.dart';
 import 'premium_services_screen.dart';
 import 'profile_screen.dart';
+import '../models/animal_profile.dart';
 import '../widgets/profile_popup.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,6 +24,13 @@ class _HomeScreenState extends State<HomeScreen>
   late AnimationController _fabAnimationController;
   late Animation<double> _fabAnimation;
   bool _showMoreOptions = false;
+
+  static const List<String> _featuredAnimalDistances = [
+    '2.1 km away',
+    '1.4 km away',
+    '3.0 km away',
+    '2.8 km away',
+  ];
 
   @override
   void initState() {
@@ -642,6 +651,8 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildHomePage() {
+    final featuredAnimals = MockAnimalDatabase.animals.take(4).toList();
+
     return RefreshIndicator(
       onRefresh: () async {
         await Future.delayed(const Duration(milliseconds: 900));
@@ -906,36 +917,14 @@ class _HomeScreenState extends State<HomeScreen>
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
               childAspectRatio: 0.68,
-              children: [
-                _buildAnimalCard(
-                  'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&h=400&fit=crop',
-                  'Max',
-                  'Golden Retriever',
-                  '2.1 km away',
-                  260,
+              children: List.generate(
+                featuredAnimals.length,
+                (index) => _buildAnimalCard(
+                  featuredAnimals[index],
+                  _featuredAnimalDistances[index],
+                  260 + (index * 60),
                 ),
-                _buildAnimalCard(
-                  'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400&h=400&fit=crop',
-                  'Luna',
-                  'Persian Cat',
-                  '1.4 km away',
-                  320,
-                ),
-                _buildAnimalCard(
-                  'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop',
-                  'Rocky',
-                  'German Shepherd',
-                  '3.0 km away',
-                  380,
-                ),
-                _buildAnimalCard(
-                  'https://images.unsplash.com/photo-1574158622682-e40e69881006',
-                  'Bella',
-                  'Tabby Cat',
-                  '2.8 km away',
-                  440,
-                ),
-              ],
+              ),
             ),
 
             const SizedBox(height: 28),
@@ -1053,9 +1042,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildAnimalCard(
-      String imageUrl,
-      String name,
-      String breed,
+      AnimalProfile animal,
       String distance,
       int delay,
       ) {
@@ -1082,6 +1069,12 @@ class _HomeScreenState extends State<HomeScreen>
           borderRadius: BorderRadius.circular(22),
           onTap: () {
             HapticFeedback.lightImpact();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AnimalDetailScreen(animal: animal),
+              ),
+            );
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1093,7 +1086,7 @@ class _HomeScreenState extends State<HomeScreen>
                     top: Radius.circular(22),
                   ),
                   child: Image.network(
-                    imageUrl,
+                    animal.imageUrl,
                     width: double.infinity,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
@@ -1113,7 +1106,7 @@ class _HomeScreenState extends State<HomeScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name,
+                      animal.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -1122,7 +1115,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      breed,
+                      animal.breed,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,

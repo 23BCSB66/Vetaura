@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "jeev_raksha" "\0"
+            VALUE "FileDescription", "vetaura" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "jeev_raksha" "\0"
+            VALUE "InternalName", "vetaura" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "jeev_raksha.exe" "\0"
-            VALUE "ProductName", "jeev_raksha" "\0"
+            VALUE "OriginalFilename", "vetaura.exe" "\0"
+            VALUE "ProductName", "vetaura" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

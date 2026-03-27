@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.jeev_raksha"
+    namespace = "com.example.vetaura"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.jeev_raksha"
+        applicationId = "com.example.vetaura"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

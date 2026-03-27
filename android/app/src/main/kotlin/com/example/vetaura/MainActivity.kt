@@ -1,4 +1,4 @@
-package com.example.jeev_raksha
+package com.example.vetaura
 
 import io.flutter.embedding.android.FlutterActivity
 
