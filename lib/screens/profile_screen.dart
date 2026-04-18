@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/user_profile.dart';
 import 'edit_profile_screen.dart';
+import '../widgets/profile_avatar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -11,55 +12,111 @@ class ProfileScreen extends StatelessWidget {
     final user = context.watch<UserProfile>();
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF4FBF8),
       appBar: AppBar(
         title: const Text("Profile"),
       ),
-
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            const SizedBox(height: 20),
-
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.teal.shade100,
-              child: Icon(
-                Icons.pets,
-                size: 40,
-                color: Colors.teal.shade700,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            Text(
-              user.username,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            ElevatedButton.icon(
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit Profile"),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const EditProfileScreen(),
+            const SizedBox(height: 12),
+            Center(
+              child: Column(
+                children: [
+                  ProfileAvatar(
+                    avatar: user.selectedAvatar,
+                    radius: 52,
+                    showRing: true,
                   ),
-                );
-              },
+                  const SizedBox(height: 16),
+                  Text(
+                    user.username,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    user.bio,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.black54,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.edit),
+                label: const Text("Edit Profile"),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const EditProfileScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+            _infoCard('Email', user.email, Icons.email_outlined),
+            const SizedBox(height: 12),
+            _infoCard('Phone', user.phone, Icons.phone_outlined),
+            const SizedBox(height: 12),
+            _infoCard('Gender', user.gender, Icons.diversity_3_outlined),
+            const SizedBox(height: 12),
+            _infoCard('Date of birth', user.dateOfBirth, Icons.cake_outlined),
+            const SizedBox(height: 12),
+            _infoCard('City', user.city, Icons.location_city_outlined),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _infoCard(String label, String value, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.teal),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black45,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

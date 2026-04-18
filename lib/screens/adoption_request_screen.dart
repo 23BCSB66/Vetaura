@@ -57,13 +57,15 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.surface,
       appBar: AppBar(
         title: const Text('Adoption Request'),
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: colors.onSurface),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -89,9 +91,10 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
                     children: [
                       Text(
                         'Adopt ${widget.animal.name}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
+                          color: colors.onSurface,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -99,7 +102,7 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
                         widget.animal.shelterName,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade600,
+                          color: colors.onSurface.withOpacity(0.65),
                         ),
                       ),
                     ],
@@ -110,11 +113,12 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
             const SizedBox(height: 32),
 
             // Form Fields
-            const Text(
+            Text(
               'Your details',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: colors.onSurface,
               ),
             ),
             const SizedBox(height: 16),
@@ -161,13 +165,15 @@ class _AdoptionRequestScreenState extends State<AdoptionRequestScreen> {
   }
 
   Widget _buildTextField(String hint, IconData icon, {int maxLines = 1}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextField(
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hint,
         prefixIcon: maxLines == 1 ? Icon(icon, color: AppColors.primary) : null,
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: isDark ? const Color(0xFF1F2D28) : Colors.grey.shade50,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,

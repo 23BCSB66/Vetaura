@@ -10,18 +10,23 @@ class AnimalDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = Theme.of(context).colorScheme;
+    final surface = colors.surface;
+    final cardColor = isDark ? const Color(0xFF17231F) : Colors.white;
+    final mutedText = colors.onSurface.withOpacity(0.68);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: surface,
       body: CustomScrollView(
         slivers: [
-          // Parallax Image Header
           SliverAppBar(
-            expandedHeight: 400.0,
+            expandedHeight: 360,
             floating: false,
             pinned: true,
-            backgroundColor: Colors.white,
+            backgroundColor: surface,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Colors.black87),
+            iconTheme: IconThemeData(color: colors.onSurface),
             actions: [
               IconButton(
                 icon: const Icon(Icons.favorite_border_rounded),
@@ -36,8 +41,11 @@ class AnimalDetailScreen extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     color: Colors.grey.shade200,
-                    child: Icon(Icons.pets,
-                        size: 80, color: Colors.grey.shade400),
+                    child: Icon(
+                      Icons.pets,
+                      size: 80,
+                      color: Colors.grey.shade400,
+                    ),
                   ),
                 ),
               ),
@@ -45,19 +53,18 @@ class AnimalDetailScreen extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: Container(
-              transform: Matrix4.translationValues(0.0, -20.0, 0.0),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              transform: Matrix4.translationValues(0, -20, 0),
+              decoration: BoxDecoration(
+                color: surface,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(30)),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title and Gender
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
@@ -66,23 +73,29 @@ class AnimalDetailScreen extends StatelessWidget {
                             children: [
                               Text(
                                 animal.name,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF2D3748),
+                                  color: colors.onSurface,
                                 ),
                               ),
                               const SizedBox(height: 6),
                               Row(
                                 children: [
-                                  Icon(Icons.location_on, size: 16, color: Colors.grey.shade500),
+                                  Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: mutedText,
+                                  ),
                                   const SizedBox(width: 4),
-                                  Text(
-                                    animal.shelterName,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade600,
-                                      fontWeight: FontWeight.w500,
+                                  Expanded(
+                                    child: Text(
+                                      animal.shelterName,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: mutedText,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -90,12 +103,17 @@ class AnimalDetailScreen extends StatelessWidget {
                             ],
                           ),
                         ),
+                        const SizedBox(width: 12),
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: animal.gender == 'Male'
-                                ? Colors.blue.shade50
-                                : Colors.pink.shade50,
+                                ? (isDark
+                                    ? Colors.blue.shade900.withOpacity(0.3)
+                                    : Colors.blue.shade50)
+                                : (isDark
+                                    ? Colors.pink.shade900.withOpacity(0.3)
+                                    : Colors.pink.shade50),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -110,102 +128,140 @@ class AnimalDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 30),
-
-                    // Quick Info Bar
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _infoCard('Age', animal.age, Colors.orange),
-                        _infoCard('Breed', animal.breed, Colors.purple),
-                        _infoCard('Type', animal.type, Colors.green),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-
-                    // User / Shelter row
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor: Colors.grey.shade200,
-                          child: Icon(Icons.maps_home_work_rounded, color: Colors.teal.shade500),
-                        ),
-                        const SizedBox(width: 14),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Posted by',
-                              style: TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                            Text(
-                              animal.shelterName,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2D3748),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-
-                    // About
-                    const Text(
-                      'About',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2D3748),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      animal.description,
-                      style: TextStyle(
-                        fontSize: 15,
-                        height: 1.6,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-
-                    // Personality Tags
-                    const Text(
-                      'Personality',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2D3748),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 28),
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
-                      children: animal.personalityTags.map((tag) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.pink.shade50,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.pink.shade100),
-                          ),
-                          child: Text(
-                            tag,
-                            style: TextStyle(
-                              color: Colors.pink.shade700,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                      children: [
+                        _infoCard(context, 'Age', animal.age, Colors.orange),
+                        _infoCard(context, 'Breed', animal.breed, Colors.purple),
+                        _infoCard(context, 'Type', animal.type, Colors.green),
+                        _infoCard(
+                          context,
+                          'Vaccination',
+                          animal.vaccinated ? 'Up to date' : 'Pending',
+                          Colors.teal,
+                        ),
+                      ],
                     ),
-                    
-                    const SizedBox(height: 100), // padding for bottom button
+                    const SizedBox(height: 28),
+                    _detailPanel(
+                      context,
+                      title: 'About',
+                      child: Text(
+                        animal.description,
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.6,
+                          color: mutedText,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _detailPanel(
+                      context,
+                      title: 'Nature',
+                      child: Text(
+                        animal.nature,
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.5,
+                          color: mutedText,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _detailPanel(
+                      context,
+                      title: 'Vaccination History',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: animal.vaccinationHistory.map((item) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.check_circle_rounded,
+                                  size: 18,
+                                  color: animal.vaccinated
+                                      ? Colors.green.shade500
+                                      : Colors.orange.shade500,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    item,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: mutedText,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _detailPanel(
+                      context,
+                      title: 'Special Care Needed',
+                      child: Text(
+                        animal.specialCare,
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.5,
+                          color: mutedText,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _detailPanel(
+                      context,
+                      title: 'Medical Conditions',
+                      child: Text(
+                        animal.medicalConditions,
+                        style: TextStyle(
+                          fontSize: 15,
+                          height: 1.5,
+                          color: mutedText,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _detailPanel(
+                      context,
+                      title: 'Personality',
+                      child: Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: animal.personalityTags.map((tag) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? Colors.pink.shade900.withOpacity(0.25)
+                                  : Colors.pink.shade50,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.pink.shade100),
+                            ),
+                            child: Text(
+                              tag,
+                              style: TextStyle(
+                                color: Colors.pink.shade700,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 120),
                   ],
                 ),
               ),
@@ -216,7 +272,7 @@ class AnimalDetailScreen extends StatelessWidget {
       bottomSheet: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -257,11 +313,51 @@ class AnimalDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoCard(String title, String value, MaterialColor color) {
+  Widget _detailPanel(
+    BuildContext context, {
+    required String title,
+    required Widget child,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF17231F) : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: colors.onSurface,
+            ),
+          ),
+          const SizedBox(height: 12),
+          child,
+        ],
+      ),
+    );
+  }
+
+  Widget _infoCard(
+    BuildContext context,
+    String title,
+    String value,
+    MaterialColor color,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: color.shade50,
+        color: isDark ? color.shade900.withOpacity(0.28) : color.shade50,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -280,7 +376,7 @@ class AnimalDetailScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: color.shade900,
+              color: isDark ? color.shade100 : color.shade900,
             ),
           ),
         ],

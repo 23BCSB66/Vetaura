@@ -60,13 +60,16 @@ class _BookingCheckoutScreenState extends State<BookingCheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.surface,
       appBar: AppBar(
         title: const Text('Checkout'),
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: colors.onSurface),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -77,15 +80,15 @@ class _BookingCheckoutScreenState extends State<BookingCheckoutScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
+                color: isDark ? const Color(0xFF17231F) : Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF22322D) : Colors.white,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.receipt_long, color: Colors.blue),
@@ -113,7 +116,7 @@ class _BookingCheckoutScreenState extends State<BookingCheckoutScreen> {
             ),
             const SizedBox(height: 32),
 
-            const Text('Schedule Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Schedule Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.onSurface)),
             const SizedBox(height: 16),
             _buildTextField('Preferred Date (DD/MM/YYYY)', Icons.calendar_today),
             const SizedBox(height: 16),
@@ -123,7 +126,7 @@ class _BookingCheckoutScreenState extends State<BookingCheckoutScreen> {
 
             const SizedBox(height: 32),
 
-            const Text('Payment Method', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Payment Method', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.onSurface)),
             const SizedBox(height: 16),
 
             // Mock Card
@@ -186,13 +189,15 @@ class _BookingCheckoutScreenState extends State<BookingCheckoutScreen> {
   }
 
   Widget _buildTextField(String hint, IconData icon, {int maxLines = 1}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextField(
       maxLines: maxLines,
       decoration: InputDecoration(
         hintText: hint,
         prefixIcon: maxLines == 1 ? Icon(icon, color: AppColors.primary) : null,
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: isDark ? const Color(0xFF1F2D28) : Colors.grey.shade50,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
