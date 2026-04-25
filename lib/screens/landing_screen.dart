@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../widgets/app_branding.dart';
 import 'login_screen.dart';
 import 'signup_screen.dart';
 
@@ -217,41 +218,12 @@ class _LandingScreenState extends State<LandingScreen>
                 child: Column(
                   children: [
                     const SizedBox(height: 42),
-                    Container(
-                      width: 96,
-                      height: 96,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.14),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.18),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.18),
-                            blurRadius: 30,
-                            offset: const Offset(0, 16),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.pets_rounded,
-                        size: 46,
-                        color: Colors.white,
-                      ),
+                    AppBrandLogo(
+                      isDark: isDark,
+                      useTransparent: true,
+                      width: 290,
                     ),
-                    const SizedBox(height: 18),
-                    const Text(
-                      'Vetaura',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 42,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: 3,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 16),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 320),
                       child: Text(

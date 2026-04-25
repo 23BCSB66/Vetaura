@@ -40,11 +40,11 @@ class AnimalDetailScreen extends StatelessWidget {
                   animal.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey.shade200,
+                    color: isDark ? Colors.white10 : Colors.grey.shade200,
                     child: Icon(
                       Icons.pets,
                       size: 80,
-                      color: Colors.grey.shade400,
+                      color: isDark ? Colors.white24 : Colors.grey.shade400,
                     ),
                   ),
                 ),

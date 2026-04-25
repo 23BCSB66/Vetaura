@@ -17,6 +17,8 @@ class BookingCheckoutScreen extends StatefulWidget {
 
 class _BookingCheckoutScreenState extends State<BookingCheckoutScreen> {
   bool _isLoading = false;
+  String _selectedPaymentMethod = 'super.money';
+  String _selectedSchedule = 'Monday, 20 Apr';
 
   void _processMockPayment() async {
     setState(() => _isLoading = true);
@@ -39,7 +41,7 @@ class _BookingCheckoutScreenState extends State<BookingCheckoutScreen> {
           ],
         ),
         content: Text(
-          'Your appointment for ${widget.serviceName} has been confirmed. The provider will contact you shortly.',
+          'Your appointment for ${widget.serviceName} has been confirmed. Payment via $_selectedPaymentMethod was successful.',
           textAlign: TextAlign.center,
         ),
         actions: [
@@ -116,72 +118,58 @@ class _BookingCheckoutScreenState extends State<BookingCheckoutScreen> {
             ),
             const SizedBox(height: 32),
 
-            Text('Schedule Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.onSurface)),
+            Text('Schedule Options', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.onSurface)),
+            const SizedBox(height: 8),
+            Text('Choose when you want the service', style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87)),
             const SizedBox(height: 16),
-            _buildTextField('Preferred Date (DD/MM/YYYY)', Icons.calendar_today),
-            const SizedBox(height: 16),
-            _buildTextField('Preferred Time (e.g., 10:00 AM)', Icons.access_time),
+            _buildScheduleOption('Monday, 20 Apr', 'Free standard scheduling.'),
+            _buildScheduleOption('Tomorrow, 19 Apr', '₹79.00 Priority scheduling.'),
+            _buildScheduleOption('Tomorrow 7 am - 12 pm', '₹99.00 Emergency scheduling. More time slots available.'),
             const SizedBox(height: 16),
             _buildTextField('Address for service', Icons.location_on, maxLines: 2),
 
             const SizedBox(height: 32),
 
-            Text('Payment Method', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.onSurface)),
+            Text('Payments', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.onSurface)),
             const SizedBox(height: 16),
 
-            // Mock Card
+            // Payment Options - Flipkart Style
             Container(
-              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5)),
-                ],
+                color: isDark ? const Color(0xFF17231F) : Colors.white,
+                border: Border.all(color: isDark ? Colors.white12 : Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(Icons.credit_card, color: Colors.white, size: 30),
-                      Text('VISA', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18, fontStyle: FontStyle.italic)),
-                    ],
+                  // UPI Header
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.qr_code_scanner_rounded, color: isDark ? Colors.white70 : Colors.black87),
+                        const SizedBox(width: 12),
+                        Text('UPI', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                        const Spacer(),
+                        Icon(Icons.keyboard_arrow_up, color: isDark ? Colors.white70 : Colors.black87),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: 20),
-                  Text('**** **** **** 4242', style: TextStyle(color: Colors.white, fontSize: 20, letterSpacing: 2)),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Card Holder\nUser', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                      Text('Expires\ndd/mm/yy', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                    ],
-                  ),
+                  const Divider(height: 1),
+                  _buildFlipkartPaymentOption('super.money', Icons.money),
+                  const Divider(height: 1),
+                  _buildFlipkartPaymentOption('Paytm', Icons.account_balance_wallet_outlined),
+                  const Divider(height: 1),
+                  _buildFlipkartPaymentOption('Google Pay', Icons.payment_rounded),
+                  const Divider(height: 1),
+                  _buildFlipkartPaymentOption('Amazon Pay', Icons.shopping_cart_checkout_rounded),
                 ],
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 16),
+            _buildCollapsedPaymentGroup('Credit / Debit / ATM Card', Icons.credit_card),
 
-            // Submit Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _processMockPayment,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text(
-                        'PAY ${widget.price}',
-                        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-              ),
-            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -209,6 +197,176 @@ class _BookingCheckoutScreenState extends State<BookingCheckoutScreen> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScheduleOption(String title, String subtitle) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isSelected = _selectedSchedule == title;
+    
+    return InkWell(
+      onTap: () => setState(() => _selectedSchedule = title),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Radio<String>(
+                value: title,
+                groupValue: _selectedSchedule,
+                onChanged: (val) => setState(() => _selectedSchedule = val!),
+                activeColor: Colors.blue.shade700,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFlipkartPaymentOption(String title, IconData icon) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isSelected = _selectedPaymentMethod == title;
+    
+    return Container(
+      color: isSelected ? (isDark ? Colors.blue.withOpacity(0.05) : Colors.blue.shade50.withOpacity(0.3)) : Colors.transparent,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: Radio<String>(
+                  value: title,
+                  groupValue: _selectedPaymentMethod,
+                  onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
+                  activeColor: Colors.blue.shade700,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+              Icon(icon, color: isDark ? Colors.white54 : Colors.black54, size: 24),
+            ],
+          ),
+          if (isSelected) ...[
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.only(left: 40),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _processMockPayment,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    elevation: 0,
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : Text(
+                          'Pay ${widget.price}',
+                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCollapsedPaymentGroup(String title, IconData icon) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isSelected = _selectedPaymentMethod == title;
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedPaymentMethod = title),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF17231F) : Colors.white,
+          border: Border.all(color: isDark ? Colors.white12 : Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Icon(icon, color: isDark ? Colors.white70 : Colors.black87),
+                  const SizedBox(width: 12),
+                  Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                  const Spacer(),
+                  Icon(isSelected ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: isDark ? Colors.white70 : Colors.black87),
+                ],
+              ),
+            ),
+            if (isSelected) ...[
+              const Divider(height: 1),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _processMockPayment,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      elevation: 0,
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : Text(
+                            'Pay ${widget.price}',
+                            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );

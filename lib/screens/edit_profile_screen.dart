@@ -60,8 +60,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       orElse: () => UserProfile.avatarOptions.first,
     );
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FBF8),
+      backgroundColor: isDark ? const Color(0xFF111A16) : const Color(0xFFF4FBF8),
       appBar: AppBar(
         title: const Text("Edit Profile"),
       ),
@@ -79,11 +81,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     showRing: true,
                   ),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     'Choose your profile photo',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
                 ],
@@ -105,12 +108,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       width: 92,
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDark ? const Color(0xFF17231F) : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isSelected
                               ? Colors.teal
-                              : Colors.grey.withOpacity(0.18),
+                              : (isDark ? Colors.white12 : Colors.grey.withOpacity(0.18)),
                           width: isSelected ? 2 : 1,
                         ),
                       ),
@@ -126,6 +129,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 11,
+                              color: isDark ? Colors.white70 : Colors.black87,
                               fontWeight: isSelected
                                   ? FontWeight.w700
                                   : FontWeight.w500,
@@ -229,12 +233,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _sectionTitle(String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: Color(0xFF2D3748),
+        color: isDark ? Colors.white : const Color(0xFF2D3748),
       ),
     );
   }
@@ -253,18 +258,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   InputDecoration _inputDecoration(String label, IconData icon) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InputDecoration(
       labelText: label,
+      labelStyle: TextStyle(color: isDark ? Colors.white60 : Colors.black54),
+      hintStyle: TextStyle(color: isDark ? Colors.white30 : Colors.black38),
       prefixIcon: Icon(icon, color: Colors.teal.shade600),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: isDark ? const Color(0xFF1F2D28) : Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(color: Colors.grey.shade200),
+        borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.grey.shade200),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),

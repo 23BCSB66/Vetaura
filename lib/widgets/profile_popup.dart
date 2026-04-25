@@ -44,6 +44,16 @@ class _ProfilePopupState extends State<ProfilePopup>
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProfile>();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+    final sheetColor = isDark
+        ? const Color(0xFF15211D).withOpacity(0.96)
+        : Colors.white.withOpacity(0.92);
+    final dividerColor =
+        isDark ? Colors.white.withOpacity(0.14) : Colors.grey.shade300;
+    final mutedText =
+        isDark ? Colors.white.withOpacity(0.68) : Colors.black54;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.78,
@@ -57,7 +67,7 @@ class _ProfilePopupState extends State<ProfilePopup>
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: Container(
-              color: Colors.white.withOpacity(0.92),
+              color: sheetColor,
               child: SingleChildScrollView(
                 controller: controller,
                 padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
@@ -70,7 +80,7 @@ class _ProfilePopupState extends State<ProfilePopup>
                         height: 4,
                         margin: const EdgeInsets.only(bottom: 22),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
+                          color: dividerColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
@@ -94,10 +104,12 @@ class _ProfilePopupState extends State<ProfilePopup>
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: Colors.teal,
+                                      color: colorScheme.primary,
                                       shape: BoxShape.circle,
                                       border: Border.all(
-                                        color: Colors.white,
+                                        color: isDark
+                                            ? const Color(0xFF15211D)
+                                            : Colors.white,
                                         width: 2,
                                       ),
                                     ),
@@ -119,9 +131,10 @@ class _ProfilePopupState extends State<ProfilePopup>
                             children: [
                               Text(
                                 user.username,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -129,8 +142,8 @@ class _ProfilePopupState extends State<ProfilePopup>
                                 user.bio,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.black54,
+                                style: TextStyle(
+                                  color: mutedText,
                                   height: 1.4,
                                 ),
                               ),
@@ -144,11 +157,12 @@ class _ProfilePopupState extends State<ProfilePopup>
                       ],
                     ),
                     const SizedBox(height: 30),
-                    const Text(
+                    Text(
                       "Profile Information",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -159,11 +173,12 @@ class _ProfilePopupState extends State<ProfilePopup>
                     _profileField("Date of Birth", user.dateOfBirth),
                     _profileField("City", user.city),
                     const SizedBox(height: 30),
-                    const Text(
+                    Text(
                       "Activity Stats",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -176,22 +191,24 @@ class _ProfilePopupState extends State<ProfilePopup>
                       ],
                     ),
                     const SizedBox(height: 30),
-                    const Text(
+                    Text(
                       "Recent Donations",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 14),
                     _historyTile("Rs 250 donated", "Food for 5 strays"),
                     _historyTile("Rs 500 donated", "Vaccination support"),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       "Rescue Cases Submitted",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -233,6 +250,8 @@ class _ProfilePopupState extends State<ProfilePopup>
   }
 
   Widget _profileField(String label, String value) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Row(
@@ -241,16 +260,17 @@ class _ProfilePopupState extends State<ProfilePopup>
             width: 120,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                color: Colors.black54,
+              style: TextStyle(
+                color: isDark ? Colors.white.withOpacity(0.68) : Colors.black54,
               ),
             ),
           ),
@@ -260,11 +280,27 @@ class _ProfilePopupState extends State<ProfilePopup>
   }
 
   Widget _historyTile(String title, String subtitle) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: const Icon(Icons.pets),
-      title: Text(title),
-      subtitle: Text(subtitle),
+      leading: Icon(
+        Icons.pets,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(
+          color: isDark ? Colors.white.withOpacity(0.68) : Colors.black54,
+        ),
+      ),
     );
   }
 }
@@ -278,28 +314,34 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: 95,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.teal.shade50,
+        color: isDark
+            ? Colors.teal.shade900.withOpacity(0.28)
+            : Colors.teal.shade50,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.teal),
+          Icon(icon, color: isDark ? Colors.teal.shade200 : Colors.teal),
           const SizedBox(height: 6),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.72),
             ),
           ),
         ],

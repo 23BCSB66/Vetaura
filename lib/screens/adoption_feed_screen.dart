@@ -198,11 +198,11 @@ class _AdoptionFeedScreenState extends State<AdoptionFeedScreen> {
                                         },
                                         errorBuilder: (_, __, ___) {
                                           return Container(
-                                            color: Colors.grey.shade200,
+                                            color: isDark ? Colors.white10 : Colors.grey.shade200,
                                             child: Icon(
                                               Icons.pets,
                                               size: 50,
-                                              color: Colors.grey.shade400,
+                                              color: isDark ? Colors.white24 : Colors.grey.shade400,
                                             ),
                                           );
                                         },

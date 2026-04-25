@@ -148,7 +148,7 @@ class _PremiumServicesScreenState extends State<PremiumServicesScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-        Text(action, style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.w800)),
+        Text(action, style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.green.shade400 : Colors.green.shade800, fontWeight: FontWeight.w800)),
       ],
     );
   }
@@ -163,6 +163,17 @@ class _PremiumServicesScreenState extends State<PremiumServicesScreen> {
     required MaterialColor color,
     required String button,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final double ratingVal = double.tryParse(rating) ?? 0.0;
+    Color ratingColor;
+    if (ratingVal >= 4.0) {
+      ratingColor = Colors.green;
+    } else if (ratingVal >= 3.0) {
+      ratingColor = Colors.orange;
+    } else {
+      ratingColor = Colors.red;
+    }
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -184,10 +195,10 @@ class _PremiumServicesScreenState extends State<PremiumServicesScreen> {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  color: color.shade50,
+                  color: isDark ? color.withOpacity(0.15) : color.shade50,
                   borderRadius: BorderRadius.circular(22),
                 ),
-                child: Icon(icon, color: color.shade500, size: 34),
+                child: Icon(icon, color: isDark ? color.shade400 : color.shade500, size: 34),
               ),
               const Spacer(),
               Column(
@@ -196,10 +207,23 @@ class _PremiumServicesScreenState extends State<PremiumServicesScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
+                      color: isDark ? Colors.black26 : Colors.orange.shade50,
                       borderRadius: BorderRadius.circular(999),
                     ),
-                    child: Text('★ $rating'),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          rating,
+                          style: TextStyle(
+                            color: ratingColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(distance, style: const TextStyle(fontSize: 12)),
@@ -220,13 +244,13 @@ class _PremiumServicesScreenState extends State<PremiumServicesScreen> {
           const SizedBox(height: 20),
           Row(
             children: [
-              Text(price, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.green.shade800)),
+              Text(price, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: isDark ? Colors.green.shade400 : Colors.green.shade800)),
               const Spacer(),
               FilledButton(
                 onPressed: () => _book(title, price),
                 style: FilledButton.styleFrom(
-                  backgroundColor: button == 'Book Now' ? Colors.green.shade800 : Colors.grey.shade100,
-                  foregroundColor: button == 'Book Now' ? Colors.white : Colors.black87,
+                  backgroundColor: button == 'Book Now' ? Colors.green.shade800 : (isDark ? Colors.white12 : Colors.grey.shade100),
+                  foregroundColor: button == 'Book Now' ? Colors.white : (isDark ? Colors.white : Colors.black87),
                 ),
                 child: Text(button),
               ),
@@ -238,6 +262,7 @@ class _PremiumServicesScreenState extends State<PremiumServicesScreen> {
   }
 
   Widget _dailyCare(String title, String subtitle, String price, IconData icon, MaterialColor color) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(14),
@@ -253,10 +278,10 @@ class _PremiumServicesScreenState extends State<PremiumServicesScreen> {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: color.shade100.withOpacity(0.65),
+                color: isDark ? color.withOpacity(0.15) : color.shade100.withOpacity(0.65),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: color.shade700),
+              child: Icon(icon, color: isDark ? color.shade400 : color.shade700),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -269,7 +294,7 @@ class _PremiumServicesScreenState extends State<PremiumServicesScreen> {
                 ],
               ),
             ),
-            Text(price, style: TextStyle(fontWeight: FontWeight.w900, color: Colors.green.shade800)),
+            Text(price, style: TextStyle(fontWeight: FontWeight.w900, color: isDark ? Colors.green.shade400 : Colors.green.shade800)),
           ],
         ),
       ),
@@ -288,12 +313,12 @@ class _PremiumServicesScreenState extends State<PremiumServicesScreen> {
         children: [
           const Text(
             'Emergency\nAssistance',
-            style: TextStyle(fontSize: 27, height: 1.15, fontWeight: FontWeight.w900),
+            style: TextStyle(fontSize: 27, height: 1.15, fontWeight: FontWeight.w900, color: Colors.white),
           ),
           const SizedBox(height: 14),
           const Text(
             'Need immediate help? Our vets are available 24/7 via video chat.',
-            style: TextStyle(fontSize: 15, height: 1.4),
+            style: TextStyle(fontSize: 15, height: 1.4, color: Colors.white),
           ),
           const SizedBox(height: 20),
           FilledButton(

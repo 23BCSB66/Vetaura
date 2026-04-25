@@ -4,8 +4,6 @@ import '../utils/app_colors.dart';
 import '../widgets/donation_amount_card.dart';
 import '../widgets/impact_card.dart';
 import '../widgets/cause_chip.dart';
-import 'package:confetti/confetti.dart';
-import 'dart:math';
 
 class DonationScreen extends StatefulWidget {
   const DonationScreen({super.key});
@@ -25,60 +23,26 @@ class _DonationScreenState extends State<DonationScreen>
 
   double weeklyGoalProgress = 0.65;
 
-  late AnimationController heartController;
-  late Animation<double> heartAnimation;
-  late ConfettiController leftConfettiController;
-  late ConfettiController rightConfettiController;
-  late ConfettiController bottomConfettiController;
-  late Animation<double> heartScale;
-  late Animation<double> heartOpacity;
-
   @override
   void initState() {
     super.initState();
-
-    heartController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
-
-    heartScale = Tween<double>(begin: 0.3, end: 1.8).animate(
-      CurvedAnimation(parent: heartController, curve: Curves.easeOutBack),
-    );
-
-    heartOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: heartController, curve: Curves.easeOut),
-    );
-    leftConfettiController = ConfettiController(
-      duration: const Duration(seconds: 2),
-    );
-    rightConfettiController = ConfettiController(
-      duration: const Duration(seconds: 2),
-    );
-
-    bottomConfettiController = ConfettiController(
-      duration: const Duration(seconds: 2),
-    );
   }
 
   @override
   void dispose() {
-    heartController.dispose();
+    customAmountController.dispose();
     super.dispose();
-    leftConfettiController.dispose();
-    rightConfettiController.dispose();
-    bottomConfettiController.dispose();
   }
 
   String getImpactMessage() {
     if (selectedAmount == '₹100') {
-      return "Feeds a stray for a day 🐶";
+      return "Feeds a stray for a day";
     } else if (selectedAmount == '₹250') {
-      return "Helps with vaccination 💉";
+      return "Helps with vaccination";
     } else if (selectedAmount == '₹500') {
-      return "Supports shelter care 🏠";
+      return "Supports shelter care";
     } else if (customAmountController.text.isNotEmpty) {
-      return "Your donation helps rescue animals 🐾";
+      return "Your donation helps rescue animals";
     }
     return "";
   }
@@ -86,29 +50,30 @@ class _DonationScreenState extends State<DonationScreen>
   void donateAction() {
     HapticFeedback.mediumImpact();
 
-    heartController.forward(from: 0);
-    leftConfettiController.play();
-    rightConfettiController.play();
-    bottomConfettiController.play();
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("Thank you for helping stray animals 🐾"),
+        content: Text("Thank you for your generous contribution."),
       ),
     );
   }
 
   Widget sectionCard({required Widget child}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        color: isDark ? const Color(0xFF17231F) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? Colors.white12 : Colors.grey.shade200,
+        ),
         boxShadow: [
-          BoxShadow(
-            blurRadius: 14,
-            color: Colors.black12,
-          )
+          if (!isDark)
+            BoxShadow(
+              blurRadius: 10,
+              color: Colors.grey.withOpacity(0.05),
+              offset: const Offset(0, 4),
+            )
         ],
       ),
       child: child,
@@ -117,27 +82,13 @@ class _DonationScreenState extends State<DonationScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
 
         body: Stack(
             children: [
-
-              /// 1️⃣ Background
-              Positioned.fill(
-                child: Opacity(
-                  opacity: 0.04,
-                  child: GridView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 5),
-                    itemBuilder: (_, __) => const Icon(Icons.pets, size: 34),
-                  ),
-                ),
-              ),
-
-              /// 2️⃣ Main Page
+              /// Main Page
               CustomScrollView(
                 slivers: [
 
@@ -180,11 +131,13 @@ class _DonationScreenState extends State<DonationScreen>
                             bottom: 24,
                             left: 20,
                             child: Text(
-                              "A small help\ncan save a life 🐾",
+                              "Support\nAnimal Rescue",
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 26,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                height: 1.2,
+                                letterSpacing: 0.5,
                               ),
                             ),
                           ),
@@ -206,10 +159,10 @@ class _DonationScreenState extends State<DonationScreen>
                               children: [
 
                                 const Text(
-                                  "Choose amount",
+                                  "Select Donation Amount",
                                   style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
 
                                 const SizedBox(height: 16),
@@ -266,7 +219,7 @@ class _DonationScreenState extends State<DonationScreen>
                                     hintText: "Custom amount",
                                     prefixText: "₹ ",
                                     filled: true,
-                                    fillColor: Colors.grey.shade100,
+                                    fillColor: isDark ? const Color(0xFF1F2D28) : Colors.grey.shade100,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(16),
                                       borderSide: BorderSide.none,
@@ -281,12 +234,12 @@ class _DonationScreenState extends State<DonationScreen>
 
                                 const SizedBox(height: 12),
 
-                                Text(
-                                  getImpactMessage(),
-                                  style: const TextStyle(
-                                    color: Colors.black54,
+                                  Text(
+                                    getImpactMessage(),
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white70 : Colors.black54,
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           ),
@@ -302,8 +255,8 @@ class _DonationScreenState extends State<DonationScreen>
                                 Text(
                                   "Your Impact",
                                   style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
 
                                 SizedBox(height: 14),
@@ -348,10 +301,10 @@ class _DonationScreenState extends State<DonationScreen>
                               children: [
 
                                 const Text(
-                                  "Choose cause",
+                                  "Select Cause",
                                   style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
 
                                 const SizedBox(height: 12),
@@ -427,62 +380,46 @@ class _DonationScreenState extends State<DonationScreen>
                           const SizedBox(height: 24),
 
                           /// MONTHLY DONATION
-                          CheckboxListTile(
-                            value: isMonthly,
-                            title: const Text("Make this monthly ❤️"),
-                            onChanged: (value) {
-                              setState(() {
-                                isMonthly = value!;
-                              });
-                            },
+                          Container(
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1F2D28) : Colors.green.shade50,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: SwitchListTile(
+                              value: isMonthly,
+                              title: const Text("Make this a monthly donation"),
+                              activeColor: AppColors.primary,
+                              onChanged: (value) {
+                                setState(() {
+                                  isMonthly = value;
+                                });
+                              },
+                            ),
                           ),
 
                           const SizedBox(height: 24),
 
                           /// DONATE BUTTON
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-
-                              SizedBox(
-                                width: double.infinity,
-                                height: 56,
-                                child: ElevatedButton.icon(
-                                  icon: const Icon(Icons.favorite),
-                                  label: const Text(
-                                    "Donate Now",
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                  ),
-                                  onPressed: donateAction,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 56,
+                            child: ElevatedButton(
+                              onPressed: donateAction,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-
-                              AnimatedBuilder(
-                                animation: heartController,
-                                builder: (context, child) {
-                                  return IgnorePointer(
-                                    child: Opacity(
-                                      opacity: heartOpacity.value,
-                                      child: Transform.scale(
-                                        scale: heartScale.value,
-                                        child: const Icon(
-                                          Icons.favorite,
-                                          color: Colors.red,
-                                          size: 120,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
+                              child: const Text(
+                                "Proceed to Donate",
+                                style: TextStyle(
+                                  fontSize: 16, 
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-
-                            ],
+                            ),
                           ),
 
                           const SizedBox(height: 30),
@@ -528,72 +465,6 @@ class _DonationScreenState extends State<DonationScreen>
                   ),
                 ],
               ),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: ConfettiWidget(
-                  confettiController: leftConfettiController,
-                  blastDirection: -pi / 4,
-                  emissionFrequency: 0.02,
-                  numberOfParticles: 70,
-                  maxBlastForce: 120,
-                  minBlastForce: 80,
-                  gravity: 0.08,
-                  shouldLoop: false,
-                  colors: const [
-                    Colors.orange,
-                    Colors.yellow,
-                    Colors.green,
-                    Colors.teal,
-                    Colors.blue,
-                    Colors.pink,
-                    Colors.red,
-                    Colors.purple,
-                  ],
-                  createParticlePath: drawPaw,
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: ConfettiWidget(
-                  confettiController: rightConfettiController,
-                  blastDirection: -3 * pi / 4,
-                  emissionFrequency: 0.02,
-                  numberOfParticles: 70,
-                  maxBlastForce: 120,
-                  minBlastForce: 80,
-                  gravity: 0.08,
-                  shouldLoop: false,
-                  colors: const [
-                    Colors.orange,
-                    Colors.yellow,
-                    Colors.green,
-                    Colors.teal,
-                    Colors.blue,
-                    Colors.pink,
-                    Colors.red,
-                    Colors.purple,
-                  ],
-                  createParticlePath: drawPaw,
-                ),
-              ),
-
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: ConfettiWidget(
-                  confettiController: bottomConfettiController,
-                  blastDirectionality: BlastDirectionality.explosive,
-                  maxBlastForce: 20,
-                  minBlastForce: 8,
-                  emissionFrequency: 0.03,
-                  numberOfParticles: 10,
-                  gravity: 0.1,
-                  colors: const [
-                    Colors.teal,
-                    Colors.green,
-                    Colors.orange,
-                  ],
-                ),
-              ),
             ]
         )
     );
@@ -612,16 +483,17 @@ class _AnimalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 140,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF17231F) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             blurRadius: 10,
-            color: Colors.black12,
+            color: isDark ? Colors.black26 : Colors.black12,
           )
         ],
       ),
@@ -638,20 +510,9 @@ class _AnimalCard extends StatelessWidget {
           const SizedBox(height: 4),
 
           Text(subtitle,
-              style: const TextStyle(fontSize: 12, color: Colors.black54)),
+              style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black54)),
         ],
       ),
     );
   }
-}
-Path drawPaw(Size size) {
-  final path = Path();
-
-  path.addOval(Rect.fromCircle(center: const Offset(0, 0), radius: 4));
-  path.addOval(Rect.fromCircle(center: const Offset(-6, -6), radius: 2));
-  path.addOval(Rect.fromCircle(center: const Offset(6, -6), radius: 2));
-  path.addOval(Rect.fromCircle(center: const Offset(-3, -10), radius: 2));
-  path.addOval(Rect.fromCircle(center: const Offset(3, -10), radius: 2));
-
-  return path;
 }

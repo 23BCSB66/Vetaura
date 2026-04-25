@@ -11,8 +11,10 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<UserProfile>();
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FBF8),
+      backgroundColor: isDark ? const Color(0xFF111A16) : const Color(0xFFF4FBF8),
       appBar: AppBar(
         title: const Text("Profile"),
       ),
@@ -42,8 +44,8 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     user.bio,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.black54,
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54,
                       height: 1.5,
                     ),
                   ),
@@ -67,26 +69,26 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            _infoCard('Email', user.email, Icons.email_outlined),
+            _infoCard('Email', user.email, Icons.email_outlined, isDark),
             const SizedBox(height: 12),
-            _infoCard('Phone', user.phone, Icons.phone_outlined),
+            _infoCard('Phone', user.phone, Icons.phone_outlined, isDark),
             const SizedBox(height: 12),
-            _infoCard('Gender', user.gender, Icons.diversity_3_outlined),
+            _infoCard('Gender', user.gender, Icons.diversity_3_outlined, isDark),
             const SizedBox(height: 12),
-            _infoCard('Date of birth', user.dateOfBirth, Icons.cake_outlined),
+            _infoCard('Date of birth', user.dateOfBirth, Icons.cake_outlined, isDark),
             const SizedBox(height: 12),
-            _infoCard('City', user.city, Icons.location_city_outlined),
+            _infoCard('City', user.city, Icons.location_city_outlined, isDark),
           ],
         ),
       ),
     );
   }
 
-  Widget _infoCard(String label, String value, IconData icon) {
+  Widget _infoCard(String label, String value, IconData icon, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF17231F) : Colors.white,
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
@@ -99,18 +101,19 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black45,
+                    color: isDark ? Colors.white54 : Colors.black45,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
               ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/booking_checkout_screen.dart';
 import '../screens/edit_profile_screen.dart';
+import '../screens/history_screen.dart';
 import '../screens/landing_screen.dart';
 import '../screens/premium_plans_screen.dart';
 import '../screens/premium_services_screen.dart';
@@ -15,6 +16,7 @@ class AppMenuDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final services = [
       ('Hair Trimming', 'Rs 399'),
       ('Bathing Session', 'Rs 349'),
@@ -35,9 +37,11 @@ class AppMenuDrawer extends StatelessWidget {
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'Care, rescue, adoption, and wellness.',
-              style: TextStyle(color: Colors.black54),
+              style: TextStyle(
+                color: isDark ? Colors.white60 : Colors.black54,
+              ),
             ),
             const SizedBox(height: 22),
             _tile(
@@ -45,6 +49,12 @@ class AppMenuDrawer extends StatelessWidget {
               'Profile',
               Icons.person_outline_rounded,
               const EditProfileScreen(),
+            ),
+            _tile(
+              context,
+              'History',
+              Icons.history_rounded,
+              const HistoryScreen(),
             ),
             _tile(
               context,

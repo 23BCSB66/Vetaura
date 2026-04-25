@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
+import 'dart:math' as math;
 import 'donation_screen.dart';
 import 'sos_routing_screen.dart';
 import 'adoption_feed_screen.dart';
 import 'animal_detail_screen.dart';
 import 'booking_checkout_screen.dart';
 import 'care_map_screen.dart';
+import 'market_screen.dart';
 import 'premium_services_screen.dart';
 import 'premium_plans_screen.dart';
+import 'vaccination_screen.dart';
 import 'profile_screen.dart';
 import '../models/animal_profile.dart';
 import '../models/user_profile.dart';
@@ -95,18 +98,14 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   bool _handleScrollNotification(ScrollNotification notification) {
-    if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) {
-      return false;
-    }
-
-    if (notification is ScrollUpdateNotification &&
-        notification.scrollDelta != null) {
-      final shouldShow = notification.scrollDelta! < 0;
-      if (shouldShow != _showMenuButton) {
-        setState(() => _showMenuButton = shouldShow);
+    if (notification is ScrollUpdateNotification) {
+      final delta = notification.scrollDelta ?? 0.0;
+      if (delta > 4.0 && _showMenuButton) {
+        setState(() => _showMenuButton = false);
+      } else if (delta < -4.0 && !_showMenuButton) {
+        setState(() => _showMenuButton = true);
       }
     }
-
     return false;
   }
 
@@ -116,10 +115,10 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _handleHorizontalDragEnd(DragEndDetails details) {
     final velocity = details.primaryVelocity ?? 0;
-    final startedNearLeftEdge = (_horizontalDragStartX ?? 999) < 36;
     _horizontalDragStartX = null;
 
-    if (_selectedIndex == 0 && startedNearLeftEdge && velocity > 350) {
+    // Open drawer on right swipe from anywhere on the homepage
+    if (_selectedIndex == 0 && velocity > 200) {
       _scaffoldKey.currentState?.openDrawer();
     }
   }
@@ -191,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen>
                 onPageChanged: _handlePageChanged,
                 children: [
                   _buildPageShell(_buildHomePage()),
-                  _buildPageShell(const CareMapScreen()),
+                  _buildPageShell(const MarketScreen()),
                   _buildPageShell(const AdoptionFeedScreen()),
                   _buildPageShell(const PremiumServicesScreen()),
                 ],
@@ -228,11 +227,7 @@ class _HomeScreenState extends State<HomeScreen>
               child: AnimatedOpacity(
                 duration: const Duration(milliseconds: 220),
                 opacity: _showMoreOptions ? 1 : 0,
-                child: ScaleTransition(
-                  scale: _fabAnimation,
-                  alignment: Alignment.bottomCenter,
-                  child: Center(child: _buildPremiumFan()),
-                ),
+                child: Center(child: _buildPremiumFan()),
               ),
             ),
           ),
@@ -428,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                         Expanded(
                           child:
-                              _buildNavItem(Icons.map_rounded, 'Care Map', 1),
+                              _buildNavItem(Icons.storefront_rounded, 'Market', 1),
                         ),
                         SizedBox(width: baseButtonSize + 20),
                         Expanded(
@@ -463,9 +458,10 @@ class _HomeScreenState extends State<HomeScreen>
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: _showMoreOptions
-                            ? [Colors.orange.shade300, Colors.pink.shade300]
-                            : [Colors.teal.shade300, Colors.green.shade400],
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Colors.green.shade400,
+                        ],
                       ),
                       border: Border.all(
                         color: Colors.white.withOpacity(isDark ? 0.16 : 0.44),
@@ -473,9 +469,7 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color:
-                              (_showMoreOptions ? Colors.pink : Colors.teal)
-                                  .withOpacity(0.30),
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.30),
                           blurRadius: _showMoreOptions ? 24 : 16,
                           offset: Offset(0, _showMoreOptions ? 10 : 6),
                         ),
@@ -627,166 +621,144 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildPremiumFan() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return AnimatedBuilder(
+      animation: _fabAnimation,
+      builder: (context, child) {
+        final val = Curves.easeOutBack.transform(_fabAnimation.value);
+        final double radius = 120 * val;
 
-    return Container(
-      width: 300,
-      height: 166,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: isDark
-              ? [
-                  Colors.white.withOpacity(0.03),
-                  Colors.white.withOpacity(0.01),
-                ]
-              : [
-                  Colors.white.withOpacity(0.20),
-                  Colors.white.withOpacity(0.08),
-                ],
-        ),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.08)
-              : Colors.white.withOpacity(0.35),
-        ),
-      ),
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Positioned(
-            left: 18,
-            bottom: 18,
-            child: _buildFanAction(
-              icon: Icons.vaccines_rounded,
-              label: 'Vaccination',
-              color: Colors.blue,
-              onTap: () => _openPremiumAction(
-                BookingCheckoutScreen(
-                  serviceName: 'At-Home Vaccination',
-                  price: 'Rs 499',
-                ),
+        Widget _buildPetal(double angle, Widget child) {
+          return Transform.translate(
+            offset: Offset(radius * math.cos(angle), -radius * math.sin(angle)),
+            child: Opacity(
+              opacity: _fabAnimation.value.clamp(0.0, 1.0),
+              child: Transform.scale(
+                scale: val.clamp(0.0, 1.0),
+                child: child,
               ),
             ),
-          ),
-          Positioned(
-            left: 74,
-            top: 8,
-            child: _buildFanAction(
-              icon: Icons.health_and_safety_rounded,
-              label: 'Vet Help',
-              color: Colors.green,
-              onTap: () => _openPremiumAction(
-                BookingCheckoutScreen(
-                  serviceName: 'Premium Vet Help',
-                  price: 'Rs 299',
+          );
+        }
+
+        return SizedBox(
+          width: 340,
+          height: 166,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              // Leftmost (Vaccination)
+              _buildPetal(
+                math.pi * 0.9,
+                _buildFanAction(
+                  icon: Icons.vaccines_rounded,
+                  label: 'Vaccination',
+                  onTap: () => _openPremiumAction(const VaccinationScreen()),
                 ),
               ),
-            ),
+              // Mid-left (Vet Help)
+              _buildPetal(
+                math.pi * 0.7,
+                _buildFanAction(
+                  icon: Icons.health_and_safety_rounded,
+                  label: 'Vet Help',
+                  onTap: () => _openPremiumAction(
+                    BookingCheckoutScreen(
+                      serviceName: 'Premium Vet Help',
+                      price: 'Rs 299',
+                    ),
+                  ),
+                ),
+              ),
+              // Center (Premium Plans)
+              _buildPetal(
+                math.pi * 0.5,
+                _buildFanAction(
+                  icon: Icons.star_rounded,
+                  label: 'Premium',
+                  isPremium: true,
+                  onTap: () => _openPremiumAction(const PremiumPlansScreen()),
+                ),
+              ),
+              // Mid-right (Care Map)
+              _buildPetal(
+                math.pi * 0.3,
+                _buildFanAction(
+                  icon: Icons.map_rounded,
+                  label: 'Care Map',
+                  onTap: () => _openPremiumAction(const CareMapScreen()),
+                ),
+              ),
+              // Rightmost (Donate)
+              _buildPetal(
+                math.pi * 0.1,
+                _buildFanAction(
+                  icon: Icons.volunteer_activism_rounded,
+                  label: 'Donate',
+                  onTap: () => _openPremiumAction(const DonationScreen()),
+                ),
+              ),
+            ],
           ),
-          Positioned(
-            right: 74,
-            top: 8,
-            child: _buildFanAction(
-              icon: Icons.volunteer_activism_rounded,
-              label: 'Donate',
-              color: Colors.pink,
-              onTap: () => _openPremiumAction(const DonationScreen()),
-            ),
-          ),
-          Positioned(
-            right: 18,
-            bottom: 18,
-            child: _buildFanAction(
-              icon: Icons.star_rounded,
-              label: 'Plans',
-              color: Colors.amber,
-              onTap: () => _openPremiumAction(const PremiumPlansScreen()),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildFanAction({
     required IconData icon,
     required String label,
-    required MaterialColor color,
     required VoidCallback onTap,
+    bool isPremium = false,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primary = Theme.of(context).colorScheme.primary;
 
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 62,
-            height: 62,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
-                    ? [
-                        color.shade900.withOpacity(0.70),
-                        color.shade700.withOpacity(0.54),
-                      ]
-                    : [
-                        Colors.white.withOpacity(0.88),
-                        color.shade50.withOpacity(0.80),
-                      ],
-              ),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withOpacity(0.10)
-                    : color.shade100,
-                width: 1.4,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(isDark ? 0.18 : 0.22),
-                  blurRadius: isDark ? 18 : 14,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Icon(
-              icon,
-              color: isDark ? Colors.white : color.shade600,
-              size: 29,
-            ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: isPremium ? 72 : 64,
+        height: isPremium ? 72 : 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isPremium
+                ? [Colors.amber.shade300, Colors.orange.shade500]
+                : [primary, Colors.green.shade400],
           ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withOpacity(0.08)
-                  : Colors.white.withOpacity(0.68),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withOpacity(0.08)
-                    : Colors.white.withOpacity(0.32),
-              ),
+          border: isPremium ? Border.all(color: Colors.amberAccent.withOpacity(0.8), width: 2.5) : null,
+          boxShadow: [
+            BoxShadow(
+              color: (isPremium ? Colors.orange : primary).withOpacity(isDark ? 0.3 : 0.4),
+              blurRadius: isPremium ? 22 : 16,
+              spreadRadius: isPremium ? 2 : 0,
+              offset: Offset(0, isPremium ? 10 : 8),
             ),
-            child: Text(
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+              size: isPremium ? 28 : 24,
+            ),
+            const SizedBox(height: 2),
+            Text(
               label,
               style: TextStyle(
-                color: isDark ? Colors.white : color.shade800,
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                fontSize: isPremium ? 9 : 8,
+                fontWeight: FontWeight.w800,
                 letterSpacing: 0.2,
               ),
+              textAlign: TextAlign.center,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -844,11 +816,6 @@ class _HomeScreenState extends State<HomeScreen>
             _animatedSection(
               delay: 0,
               child: _buildPetHealthCard(),
-            ),
-            const SizedBox(height: 18),
-            _animatedSection(
-              delay: 40,
-              child: _buildHomeShortcutGrid(),
             ),
             const SizedBox(height: 24),
             _animatedSection(
@@ -1151,11 +1118,6 @@ class _HomeScreenState extends State<HomeScreen>
               delay: 0,
               child: _buildPetHealthCard(),
             ),
-            const SizedBox(height: 18),
-            _animatedSection(
-              delay: 40,
-              child: _buildHomeShortcutGrid(),
-            ),
             const SizedBox(height: 24),
             _animatedSection(
               delay: 80,
@@ -1372,85 +1334,6 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildHomeShortcutGrid() {
-    final shortcuts = <_HomeShortcut>[
-      _HomeShortcut(
-        'Book Vet',
-        Icons.calendar_month_rounded,
-        Colors.green,
-        () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BookingCheckoutScreen(
-                serviceName: 'Vet Visit',
-                price: 'Rs 699',
-              ),
-            ),
-          );
-        },
-      ),
-      _HomeShortcut(
-        'Grooming',
-        Icons.content_cut_rounded,
-        Colors.orange,
-        () => _changeTab(3),
-      ),
-      _HomeShortcut(
-        'Walking',
-        Icons.pets_rounded,
-        Colors.green,
-        () => _changeTab(3),
-      ),
-    ];
-
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.18,
-      children: shortcuts.map((item) {
-        return GestureDetector(
-          onTap: item.onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              color: _homeCardColor(lightOpacity: 0.9),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: _softShadowColor(),
-                  blurRadius: 14,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: item.color.shade100,
-                  child: Icon(item.icon, color: item.color.shade700),
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  item.label,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
   Widget _buildUpcomingReminders() {
     return Column(
       children: [
@@ -1527,51 +1410,202 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildPremiumUpgradeCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(26),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.amber.shade700, Colors.orange.shade800],
-        ),
-        borderRadius: BorderRadius.circular(28),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: Stack(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+            width: double.infinity,
+            padding: const EdgeInsets.all(26),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.18),
-              borderRadius: BorderRadius.circular(999),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFFFD95A),
+                  Color(0xFFFFBF1F),
+                  Color(0xFFFF9F0A),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.16),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.amber.withOpacity(0.24),
+                  blurRadius: 22,
+                  offset: const Offset(0, 12),
+                ),
+              ],
             ),
-            child: const Text('PLUS+ FEATURE',
-                style: TextStyle(color: Colors.white, letterSpacing: 2)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.18),
+                    ),
+                  ),
+                  child: const Text(
+                    'ROYAL GOLD',
+                    style: TextStyle(
+                      color: Colors.white,
+                      letterSpacing: 2.1,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Upgrade to Premium',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          height: 1.08,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Icon(
+                      Icons.workspace_premium_rounded,
+                      color: Colors.white,
+                      size: 34,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Unlock Gold-tier vet support, richer wellness perks, and a faster premium care lane whenever you need help.',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.94),
+                    fontSize: 15.5,
+                    height: 1.4,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _premiumPill('24/7 Vet Chat'),
+                    _premiumPill('Priority Support'),
+                    _premiumPill('Gold Perks'),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                FilledButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PremiumPlansScreen(),
+                      ),
+                    );
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFFD88400),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Explore Plans',
+                        style: TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward_rounded, size: 18),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 22),
-          const Text('Upgrade to Premium',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900)),
-          const SizedBox(height: 14),
-          const Text('Get 24/7 unlimited vet chat and health insurance perks.',
-              style: TextStyle(color: Colors.white, fontSize: 16, height: 1.4)),
-          const SizedBox(height: 22),
-          FilledButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const PremiumPlansScreen()),
-              );
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.brown.shade700,
+          Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withOpacity(0.16),
+                      Colors.transparent,
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.26, 1.0],
+                  ),
+                ),
+              ),
             ),
-            child: const Text('Get Started'),
+          ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: -1.1, end: 1.5),
+                duration: const Duration(milliseconds: 2400),
+                curve: Curves.easeInOut,
+                builder: (context, value, _) {
+                  return Transform.translate(
+                    offset: Offset(340 * value, 0),
+                    child: Transform.rotate(
+                      angle: -0.34,
+                      child: Container(
+                        width: 88,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withOpacity(0.0),
+                              Colors.white.withOpacity(0.20),
+                              Colors.white.withOpacity(0.0),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _premiumPill(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withOpacity(0.15)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: Colors.white.withOpacity(0.96),
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
@@ -1774,13 +1808,4 @@ class _RescueCaseCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class _HomeShortcut {
-  final String label;
-  final IconData icon;
-  final MaterialColor color;
-  final VoidCallback onTap;
-
-  const _HomeShortcut(this.label, this.icon, this.color, this.onTap);
 }

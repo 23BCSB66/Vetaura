@@ -5,12 +5,16 @@ class CareMapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mapColor = isDark ? const Color(0xFF1F2F28) : const Color(0xFF9FB489);
+    final surfaceColor = isDark ? const Color(0xFF1A2621) : Colors.white;
+    
     return Stack(
       children: [
         Positioned.fill(
           child: Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF9FB489),
+            decoration: BoxDecoration(
+              color: mapColor,
             ),
             child: CustomPaint(painter: _MapGridPainter()),
           ),
@@ -37,10 +41,10 @@ class CareMapScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.75),
+                        color: surfaceColor.withOpacity(0.85),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.tune_rounded),
+                      child: Icon(Icons.tune_rounded, color: isDark ? Colors.white : Colors.black87),
                     ),
                   ],
                 ),
@@ -50,17 +54,17 @@ class CareMapScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: surfaceColor.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(28),
                   ),
                   child: Row(
                     children: [
                       const Icon(Icons.search_rounded, size: 30),
                       const SizedBox(width: 14),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Search clinics, groomers',
-                          style: TextStyle(fontSize: 17, color: Colors.black54),
+                          style: TextStyle(fontSize: 17, color: isDark ? Colors.white70 : Colors.black54),
                         ),
                       ),
                       Container(
@@ -87,19 +91,19 @@ class CareMapScreen extends StatelessWidget {
                     Positioned(
                       top: 96,
                       left: 175,
-                      child: _pin(Icons.local_hospital_rounded, 'Paw Clinic', Colors.green),
+                      child: _pin(context, Icons.local_hospital_rounded, 'Paw Clinic', Colors.green),
                     ),
                     Positioned(
                       top: 250,
                       right: 50,
-                      child: _pin(Icons.content_cut_rounded, 'Shiny Paws', Colors.orange),
+                      child: _pin(context, Icons.content_cut_rounded, 'Shiny Paws', Colors.orange),
                     ),
                     Positioned(
                       top: 70,
                       right: 24,
                       child: FloatingActionButton.small(
                         heroTag: 'locate',
-                        backgroundColor: Colors.white,
+                        backgroundColor: surfaceColor,
                         foregroundColor: Colors.green.shade800,
                         onPressed: () {},
                         child: const Icon(Icons.my_location_rounded),
@@ -112,9 +116,9 @@ class CareMapScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Top Rated Nearby',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: isDark ? Colors.white : Colors.black87),
                           ),
                           Text('See All', style: TextStyle(color: Colors.green.shade800, fontWeight: FontWeight.w900)),
                         ],
@@ -129,9 +133,9 @@ class CareMapScreen extends StatelessWidget {
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         children: [
-                          _nearbyCard('Central Pet Hospital', '0.8 miles away', Icons.local_hospital_rounded, Colors.blue, '4.9'),
+                          _nearbyCard(context, 'Central Pet Hospital', '0.8 miles away', Icons.local_hospital_rounded, Colors.blue, '4.9'),
                           const SizedBox(width: 14),
-                          _nearbyCard('Paws & Bubbles', '1.2 miles away', Icons.content_cut_rounded, Colors.orange, '4.8'),
+                          _nearbyCard(context, 'Paws & Bubbles', '1.2 miles away', Icons.content_cut_rounded, Colors.orange, '4.8'),
                         ],
                       ),
                     ),
@@ -145,7 +149,8 @@ class CareMapScreen extends StatelessWidget {
     );
   }
 
-  Widget _pin(IconData icon, String label, MaterialColor color) {
+  Widget _pin(BuildContext context, IconData icon, String label, MaterialColor color) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       children: [
         Container(
@@ -154,7 +159,7 @@ class CareMapScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: color.shade700,
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 3),
+            border: Border.all(color: isDark ? const Color(0xFF1F2F28) : Colors.white, width: 3),
           ),
           child: Icon(icon, color: Colors.white),
         ),
@@ -162,20 +167,31 @@ class CareMapScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.82),
+            color: isDark ? const Color(0xFF1A2621).withOpacity(0.9) : Colors.white.withOpacity(0.82),
             borderRadius: BorderRadius.circular(999),
           ),
-          child: Text(label, style: TextStyle(color: color.shade800, fontWeight: FontWeight.w900)),
+          child: Text(label, style: TextStyle(color: isDark ? color.shade400 : color.shade800, fontWeight: FontWeight.w900)),
         ),
       ],
     );
   }
 
-  Widget _nearbyCard(String title, String distance, IconData icon, MaterialColor color, String rating) {
+  Widget _nearbyCard(BuildContext context, String title, String distance, IconData icon, MaterialColor color, String rating) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final double ratingVal = double.tryParse(rating) ?? 0.0;
+    Color ratingColor;
+    if (ratingVal >= 4.0) {
+      ratingColor = Colors.green;
+    } else if (ratingVal >= 3.0) {
+      ratingColor = Colors.orange;
+    } else {
+      ratingColor = Colors.red;
+    }
+
     return Container(
       width: 280,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1A2621) : Colors.white,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
@@ -184,10 +200,10 @@ class CareMapScreen extends StatelessWidget {
             width: 120,
             margin: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.shade100,
+              color: isDark ? color.withOpacity(0.15) : color.shade100,
               borderRadius: BorderRadius.circular(18),
             ),
-            child: Icon(icon, color: color.shade700, size: 54),
+            child: Icon(icon, color: isDark ? color.shade400 : color.shade700, size: 54),
           ),
           Expanded(
             child: Padding(
@@ -201,10 +217,23 @@ class CareMapScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: isDark ? Colors.black26 : Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: Text('★ $rating'),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                          const SizedBox(width: 4),
+                          Text(
+                            rating,
+                            style: TextStyle(
+                              color: ratingColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const Spacer(),
